@@ -1,0 +1,36 @@
+{
+  "projectName": "spring-jms-xa",
+  "projectOwner": "turing85",
+  "files": [
+    "CONTRIBUTORS.md",
+    "README.adoc"
+  ],
+  "commit": false,
+  "contributorsSortAlphabetically": false,
+  "contributors": [
+    {
+      "login": "turing85",
+      "name": "Marco Bungart",
+      "avatar_url": "https://avatars.githubusercontent.com/u/32584495?v=4",
+      "profile": "https://turing85.github.io",
+      "contributions": [
+        "code",
+        "maintenance",
+        "doc"
+      ]
+    },
+    {
+      "login": "zhfeng",
+      "name": "Zheng Feng",
+      "avatar_url": "https://avatars.githubusercontent.com/u/1246139?v=4",
+      "profile": "https://zhfeng.github.io/",
+      "contributions": [
+        "code",
+        "maintenance"
+      ]
+    }
+  ],
+  "commitConvention": "angular",
+  "contributorsPerLine": 7,
+  "commitType": "docs"
+}
