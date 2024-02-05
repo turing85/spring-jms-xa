@@ -10,6 +10,6 @@ class WithTenConsumersAndDefaultTest extends BaseTest {
   @DynamicPropertySource
   static void jmsFactoryProperties(DynamicPropertyRegistry registry) {
     registry.add("jms-factory.concurrent-consumers", () -> "10");
-    registry.add("jms-factory.use-thread-pool-executor", () -> "false");
+    registry.add("jms-factory.thread-pool-executor.enabled", () -> "false");
   }
 }

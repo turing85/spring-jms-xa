@@ -20,11 +20,12 @@ public class BeanProvider {
   @Bean(JMS_FACTORY)
   public DefaultJmsListenerContainerFactory jmsFactory(
       @Value("${jms-factory.concurrent-consumers}") int concurrentConsumers,
-      @Value("${jms-factory.use-thread-pool-executor}") boolean useThreadPoolExecutor,
+      @Value("${jms-factory.thread-pool-executor.enabled}") boolean useThreadPoolExecutor,
+      @Value("${jms-factory.thread-pool-executor.num-threads:1}") int numThreads,
       DefaultJmsListenerContainerFactoryConfigurer configurer,
       @SuppressWarnings("SpringJavaInjectionPointsAutowiringInspection") XAConnectionFactoryWrapper connectionFactoryWrapper,
-      ActiveMQConnectionFactory connectionFactory,
-      JtaTransactionManager jtaTransactionManager) throws Exception {
+      ActiveMQConnectionFactory connectionFactory, JtaTransactionManager jtaTransactionManager)
+      throws Exception {
     DefaultJmsListenerContainerFactory factory = new DefaultJmsListenerContainerFactory() {
       @Override
       @NonNull
@@ -38,7 +39,7 @@ public class BeanProvider {
     configurer.configure(factory,
         connectionFactoryWrapper.wrapConnectionFactory(connectionFactory));
     if (useThreadPoolExecutor) {
-      factory.setTaskExecutor(Executors.newFixedThreadPool(4));
+      factory.setTaskExecutor(Executors.newFixedThreadPool(numThreads));
     }
     return factory;
   }

@@ -5,16 +5,23 @@ This repository demonstrates a problem with spring-jms when more than 9 concurre
 In this case, we loose some XA-properties. When the transaction is rolled back, the message is consumed and no longer on the queue.
 
 == Project setup
+Branch `main` uses narayana as transaction-manager; branch `atomikos` uses atomikos as trasnaction manager. Both branches behave identical wrt. test outcome.
+
 The container factory is configured in link:src/main/java/de/turing85/spring/boot/jms/xa/config/BeanProvider.java[]. We have one abstract base test class in link:src/test/java/de/turing85/spring/boot/jms/xa/listener/executor/BaseTest.java[], providing two tests: one happy path test, one rollback test.
 
 The actual tests:
 
 - link:src/test/java/de/turing85/spring/boot/jms/xa/listener/executor/deflt/WithNineConsumerAndDefaultTest.java[]
 - link:src/test/java/de/turing85/spring/boot/jms/xa/listener/executor/deflt/WithTenConsumersAndDefaultTest.java[]
-- link:src/test/java/de/turing85/spring/boot/jms/xa/listener/executor/threadpool/WithNineConsumersAndThreadPoolTest.java[]
-- link:src/test/java/de/turing85/spring/boot/jms/xa/listener/executor/threadpool/WithTenConsumersAndThreadPoolTest.java[]
+- link:src/test/java/de/turing85/spring/boot/jms/xa/listener/executor/threadpool/threads/nine/WithNineConsumersAndThreadPoolNineThreadsTest.java[]
+- link:src/test/java/de/turing85/spring/boot/jms/xa/listener/executor/threadpool/threads/nine/WithTenConsumersAndThreadPoolNineThreadsTest.java[]
+- link:src/test/java/de/turing85/spring/boot/jms/xa/listener/executor/threadpool/threads/ten/WithNineConsumersAndThreadPoolTenThreadsTest.java[]
+- link:src/test/java/de/turing85/spring/boot/jms/xa/listener/executor/threadpool/threads/ten/WithTenConsumersAndThreadPoolTenThreadsTest.java[]
 
-configure the container differently. All tests succeed, except for `de.turing85.spring.boot.jms.xa.listener.executor.deflt.WithTenConsumersAndDefaultTest::rollbackTest`.
+configure the container differently. All tests succeed, except for:
+
+- `WithTenConsumersAndDefaultTest:roolbackTest`, and
+- `WithTenConsumersAndThreadPoolTenThreadsTest::rollbackTest`
 
 == Test execution
 In order to execute the tests, a docker or docker-compatible container runtime, as well as a working testcontainers-setup is needed.
