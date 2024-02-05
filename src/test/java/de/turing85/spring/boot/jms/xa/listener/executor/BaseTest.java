@@ -1,7 +1,6 @@
 package de.turing85.spring.boot.jms.xa.listener.executor;
 
 import java.time.Duration;
-import java.util.Map;
 
 import jakarta.jms.ConnectionFactory;
 import jakarta.jms.JMSException;
@@ -9,56 +8,28 @@ import jakarta.jms.Message;
 
 import com.google.common.truth.Truth;
 import de.turing85.spring.boot.jms.xa.listener.MessageListener;
+import de.turing85.spring.boot.jms.xa.listener.executor.extension.ArtemisContainerExtension;
 import io.restassured.RestAssured;
 import org.apache.activemq.artemis.jms.client.ActiveMQConnectionFactory;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.server.LocalServerPort;
 import org.springframework.http.HttpStatus;
 import org.springframework.jms.core.JmsTemplate;
 import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.DynamicPropertySource;
-import org.testcontainers.containers.GenericContainer;
-import org.testcontainers.containers.output.Slf4jLogConsumer;
-import org.testcontainers.containers.wait.strategy.Wait;
-import org.testcontainers.junit.jupiter.Container;
-import org.testcontainers.junit.jupiter.Testcontainers;
 import org.testcontainers.shaded.org.awaitility.Awaitility;
-import org.testcontainers.utility.DockerImageName;
 
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.not;
 
-@Testcontainers
+@ExtendWith({ArtemisContainerExtension.class})
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 public abstract class BaseTest {
-  public static final String ARTEMIS_USERNAME = "admin";
-  public static final String ARTEMIS_PASSWORD = "admin";
-
-  private static final Logger TC_LOGGER = LoggerFactory.getLogger("\uD83D\uDC33");
-
-  @Container
-  @SuppressWarnings("resource")
-  // @formatter:off
-  protected static final GenericContainer<?> ARTEMIS =
-      new GenericContainer<>(
-          DockerImageName.parse("docker.io/apache/activemq-artemis:2.32.0-alpine"))
-          .withEnv(Map.of(
-              "ARTEMIS_USER", ARTEMIS_USERNAME,
-              "ARTEMIS_PASSWORD", ARTEMIS_PASSWORD))
-          .withExposedPorts(61616, 8161)
-          .withLogConsumer(new Slf4jLogConsumer(TC_LOGGER)
-              .withSeparateOutputStreams())
-          .waitingFor(Wait
-              .forHttp("/console")
-              .forPort(8161)
-              .forStatusCode(HttpStatus.OK.value()));
-  // @formatter:on
 
   private static JmsTemplate JMS_TEMPLATE;
 
@@ -67,15 +38,16 @@ public abstract class BaseTest {
 
   @DynamicPropertySource
   static void artemisProperties(DynamicPropertyRegistry registry) {
-    registry.add("spring.artemis.broker-url", BaseTest::constructBrokerUrl);
-    registry.add("spring.artemis.user", () -> ARTEMIS_USERNAME);
-    registry.add("spring.artemis.password", () -> ARTEMIS_PASSWORD);
+    registry.add("spring.artemis.broker-url", ArtemisContainerExtension::constructBrokerUrl);
+    registry.add("spring.artemis.user", () -> ArtemisContainerExtension.USERNAME);
+    registry.add("spring.artemis.password", () -> ArtemisContainerExtension.PASSWORD);
   }
 
   @BeforeAll
   static void globalSetup() {
     ConnectionFactory factory =
-        new ActiveMQConnectionFactory(constructBrokerUrl(), ARTEMIS_USERNAME, ARTEMIS_PASSWORD);
+        new ActiveMQConnectionFactory(ArtemisContainerExtension.constructBrokerUrl(),
+            ArtemisContainerExtension.USERNAME, ArtemisContainerExtension.PASSWORD);
     JMS_TEMPLATE = new JmsTemplate(factory);
     JMS_TEMPLATE.setReceiveTimeout(Duration.ofMillis(200).toMillis());
   }
@@ -118,10 +90,6 @@ public abstract class BaseTest {
     // THEN
     serviceIsDownAfter(Duration.ofSeconds(5));
     messageIsInQueue(message);
-  }
-
-  private static String constructBrokerUrl() {
-    return "tcp://%s:%d".formatted(ARTEMIS.getHost(), ARTEMIS.getMappedPort(61616));
   }
 
   private void stopService() {

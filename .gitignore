@@ -2,4 +2,6 @@ target/
 .idea/
 transaction-logs/
 
+tm*.lck
+tm*.log
 *.iml
