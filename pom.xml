@@ -18,8 +18,8 @@
         <surefire-plugin.version>3.2.5</surefire-plugin.version>
 
         <!-- Dependency versions -->
+        <atomikos.version>6.0.0</atomikos.version>
         <lombok.version>1.18.30</lombok.version>
-        <narayana-spring-boot.version>3.0.0</narayana-spring-boot.version>
         <spring-boot.version>3.2.2</spring-boot.version>
 
         <!-- Test dependency versions -->
@@ -195,9 +195,9 @@
             <artifactId>spring-boot-starter-actuator</artifactId>
         </dependency>
         <dependency>
-            <groupId>dev.snowdrop</groupId>
-            <artifactId>narayana-spring-boot-starter</artifactId>
-            <version>${narayana-spring-boot.version}</version>
+            <groupId>com.atomikos</groupId>
+            <artifactId>transactions-spring-boot3-starter</artifactId>
+            <version>${atomikos.version}</version>
         </dependency>
 
         <!-- Test dependencies -->
