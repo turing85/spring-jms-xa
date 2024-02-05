@@ -56,12 +56,12 @@ public abstract class BaseTest {
   void setup() throws JMSException {
     RestAssured.baseURI = "http://localhost:%d".formatted(sutPort);
     stopService();
-    serviceIsDown();
+    assertThatServiceIsDown();
 
     emptyQueue();
 
     startService();
-    serviceIsUp();
+    assertThatServiceIsUp();
   }
 
   @Test
@@ -74,8 +74,8 @@ public abstract class BaseTest {
     JMS_TEMPLATE.send(MessageListener.QUEUE, session -> session.createTextMessage(message));
 
     // THEN
-    messageIsConsumedAfter(Duration.ofSeconds(5));
-    serviceIsUp();
+    assertThatMessageIsConsumedAfter(Duration.ofSeconds(5));
+    assertThatServiceIsUp();
   }
 
   @Test
@@ -88,8 +88,8 @@ public abstract class BaseTest {
     JMS_TEMPLATE.send(MessageListener.QUEUE, session -> session.createTextMessage(message));
 
     // THEN
-    serviceIsDownAfter(Duration.ofSeconds(5));
-    messageIsInQueue(message);
+    assertThatServiceIsDownAfter(Duration.ofSeconds(5));
+    assertThatMessageIsInQueue(message);
   }
 
   private void stopService() {
@@ -115,25 +115,25 @@ public abstract class BaseTest {
     }
   }
 
-  private void messageIsConsumedAfter(Duration duration) {
+  private void assertThatMessageIsConsumedAfter(Duration duration) {
     // @formatter:off
     Awaitility.await()
         .atMost(duration)
-        .untilAsserted(this::messageIsConsumed);
+        .untilAsserted(this::assertThatMessageIsConsumed);
     // @formatter:on
   }
 
-  private void messageIsConsumed() {
+  private void assertThatMessageIsConsumed() {
     Truth.assertThat(JMS_TEMPLATE.receive(MessageListener.QUEUE)).isNull();
   }
 
-  private void messageIsInQueue(String message) throws JMSException {
+  private void assertThatMessageIsInQueue(String message) throws JMSException {
     Message received = JMS_TEMPLATE.receive(MessageListener.QUEUE);
     Truth.assertThat(received).isNotNull();
     Truth.assertThat(received.getBody(String.class)).isEqualTo(message);
   }
 
-  private void serviceIsUp() {
+  private void assertThatServiceIsUp() {
     // @formatter:off
     RestAssured
         .when().get("actuator/health")
@@ -141,15 +141,15 @@ public abstract class BaseTest {
     // @formatter:on
   }
 
-  private void serviceIsDownAfter(Duration duration) {
+  private void assertThatServiceIsDownAfter(Duration duration) {
     // @formatter:off
     Awaitility.await()
         .atMost(duration)
-        .untilAsserted(this::serviceIsDown);
+        .untilAsserted(this::assertThatServiceIsDown);
     // @formatter:on
   }
 
-  private void serviceIsDown() {
+  private void assertThatServiceIsDown() {
     // @formatter:off
     RestAssured
         .when().get("actuator/health")
