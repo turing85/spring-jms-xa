@@ -23,10 +23,11 @@ public class ArtemisContainerExtension
   // @formatter:off
   @SuppressWarnings("resource")
   private static final GenericContainer<?> ARTEMIS = new GenericContainer<>(DockerImageName
-      .parse("docker.io/apache/activemq-artemis:2.32.0-alpine"))
+      .parse("quay.io/artemiscloud/activemq-artemis-broker:artemis.2.32.0"))
       .withEnv(Map.of(
-          "ARTEMIS_USER", USERNAME,
-          "ARTEMIS_PASSWORD", PASSWORD))
+          "AMQ_USER", USERNAME,
+          "AMQ_PASSWORD", PASSWORD,
+          "AMQ_EXTRA_ARGS", "--relax-jolokia"))
       .withExposedPorts(61616, 8161)
       .withLogConsumer(new Slf4jLogConsumer(TC_LOGGER)
           .withSeparateOutputStreams())
