@@ -1,7 +1,5 @@
 package de.turing85.spring.boot.jms.xa.listener.executor.extension;
 
-import java.util.Map;
-
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.extension.BeforeAllCallback;
 import org.junit.jupiter.api.extension.ExtensionContext;
@@ -12,6 +10,7 @@ import org.testcontainers.containers.GenericContainer;
 import org.testcontainers.containers.output.Slf4jLogConsumer;
 import org.testcontainers.containers.wait.strategy.Wait;
 import org.testcontainers.utility.DockerImageName;
+import org.testcontainers.utility.MountableFile;
 
 @Slf4j
 public class ArtemisContainerExtension
@@ -23,11 +22,16 @@ public class ArtemisContainerExtension
   // @formatter:off
   @SuppressWarnings("resource")
   private static final GenericContainer<?> ARTEMIS = new GenericContainer<>(DockerImageName
-      .parse("quay.io/artemiscloud/activemq-artemis-broker:artemis.2.32.0"))
-      .withEnv(Map.of(
-          "AMQ_USER", USERNAME,
-          "AMQ_PASSWORD", PASSWORD,
-          "AMQ_EXTRA_ARGS", "--relax-jolokia"))
+      .parse("quay.io/artemiscloud/activemq-artemis-broker-kubernetes:artemis.2.32.0"))
+      .withEnv("AMQ_USER", USERNAME)
+      .withEnv("AMQ_PASSWORD", PASSWORD)
+      .withEnv("AMQ_EXTRA_ARGS", "--relax-jolokia")
+      .withCopyToContainer(
+          MountableFile.forClasspathResource("artemis/opt/amq/bin/broker.xml", 0x444),
+          "/opt/amq/bin/broker.xml")
+      .withCopyToContainer(
+          MountableFile.forClasspathResource("artemis/opt/amq/bin/configure_custom_config.sh", 0x555),
+          "/opt/amq/bin/configure_custom_config.sh")
       .withExposedPorts(61616, 8161)
       .withLogConsumer(new Slf4jLogConsumer(TC_LOGGER)
           .withSeparateOutputStreams())
