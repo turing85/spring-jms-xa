@@ -2,7 +2,6 @@ package de.turing85.spring.boot.jms.xa.listener.executor;
 
 import java.time.Duration;
 
-import jakarta.jms.ConnectionFactory;
 import jakarta.jms.JMSException;
 import jakarta.jms.Message;
 
@@ -45,10 +44,9 @@ public abstract class BaseTest {
 
   @BeforeAll
   static void globalSetup() {
-    ConnectionFactory factory =
+    JMS_TEMPLATE = new JmsTemplate(
         new ActiveMQConnectionFactory(ArtemisContainerExtension.constructBrokerUrl(),
-            ArtemisContainerExtension.USERNAME, ArtemisContainerExtension.PASSWORD);
-    JMS_TEMPLATE = new JmsTemplate(factory);
+            ArtemisContainerExtension.USERNAME, ArtemisContainerExtension.PASSWORD));
     JMS_TEMPLATE.setReceiveTimeout(Duration.ofMillis(200).toMillis());
   }
 

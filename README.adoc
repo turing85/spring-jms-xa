@@ -1,5 +1,7 @@
 = spring-jms-xa
 
+IMPORTANT: The issue has been solved. The message broker was configured to move messages to the DLQ after 10 failed attempts.
+
 This repository demonstrates a problem with spring-jms when more than 9 concurrent consumers in conjunction with the default task executor (see link:https://github.com/spring-projects/spring-framework/blob/ea52ecc5e08a14869ec351af38481c4008c8bcd8/spring-jms/src/main/java/org/springframework/jms/listener/DefaultMessageListenerContainer.java#L764-L768[here (`github.com`)]) is used.
 
 In this case, we loose some XA-properties. When the transaction is rolled back, the message is consumed and no longer on the queue.
