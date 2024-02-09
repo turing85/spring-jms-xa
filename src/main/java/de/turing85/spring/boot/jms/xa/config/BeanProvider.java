@@ -33,7 +33,6 @@ public class BeanProvider {
   public UserTransactionManager transactionManager() {
     UserTransactionManager userTransactionManager = new UserTransactionManager();
     userTransactionManager.setForceShutdown(false);
-
     return userTransactionManager;
   }
 
@@ -48,7 +47,8 @@ public class BeanProvider {
       @Value("${jms-factory.concurrent-consumers}") int concurrentConsumers,
       @Value("${jms-factory.thread-pool-executor.enabled}") boolean useThreadPoolExecutor,
       @Value("${jms-factory.thread-pool-executor.num-threads:1}") int numThreads,
-      DefaultJmsListenerContainerFactoryConfigurer configurer, ConnectionFactory connectionFactory,
+      DefaultJmsListenerContainerFactoryConfigurer configurer,
+      @SuppressWarnings("SpringJavaInjectionPointsAutowiringInspection") ConnectionFactory connectionFactory,
       PlatformTransactionManager platformTransactionManager) {
     DefaultJmsListenerContainerFactory factory = new DefaultJmsListenerContainerFactory() {
       @Override

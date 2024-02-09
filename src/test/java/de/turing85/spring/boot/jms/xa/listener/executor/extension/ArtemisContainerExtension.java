@@ -19,6 +19,7 @@ public class ArtemisContainerExtension
   public static final String PASSWORD = "admin";
 
   private static final Logger TC_LOGGER = LoggerFactory.getLogger("\uD83D\uDC33");
+
   // @formatter:off
   @SuppressWarnings("resource")
   private static final GenericContainer<?> ARTEMIS = new GenericContainer<>(DockerImageName
@@ -33,8 +34,7 @@ public class ArtemisContainerExtension
           MountableFile.forClasspathResource("artemis/opt/amq/bin/configure_custom_config.sh", 0x555),
           "/opt/amq/bin/configure_custom_config.sh")
       .withExposedPorts(61616, 8161)
-      .withLogConsumer(new Slf4jLogConsumer(TC_LOGGER)
-          .withSeparateOutputStreams())
+      .withLogConsumer(new Slf4jLogConsumer(TC_LOGGER).withSeparateOutputStreams())
       .waitingFor(Wait
           .forHttp("/console")
           .forPort(8161)
@@ -57,7 +57,7 @@ public class ArtemisContainerExtension
   @Override
   public void close() {
     if (ARTEMIS.isRunning()) {
-      ARTEMIS.close();
+      ARTEMIS.stop();
     }
   }
 }
