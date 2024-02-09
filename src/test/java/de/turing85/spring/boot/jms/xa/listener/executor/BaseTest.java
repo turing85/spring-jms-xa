@@ -29,7 +29,6 @@ import static org.hamcrest.Matchers.not;
 @ExtendWith({ArtemisContainerExtension.class})
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 public abstract class BaseTest {
-
   private static JmsTemplate JMS_TEMPLATE;
 
   @LocalServerPort
@@ -93,7 +92,7 @@ public abstract class BaseTest {
   private void stopService() {
     // @formatter:off
     RestAssured
-        .when().post("%s/%s".formatted(MessageListener.ROOT_PATH, MessageListener.STOP_PATH))
+        .when().post("listener/stop")
         .then().statusCode(is(HttpStatus.OK.value()));
     // @formatter:on
   }
@@ -101,7 +100,7 @@ public abstract class BaseTest {
   private void startService() {
     // @formatter:off
     RestAssured
-        .when().post("%s/%s".formatted(MessageListener.ROOT_PATH, MessageListener.START_PATH))
+        .when().post("listener/start")
         .then().statusCode(is(HttpStatus.OK.value()));
     // @formatter:on
   }

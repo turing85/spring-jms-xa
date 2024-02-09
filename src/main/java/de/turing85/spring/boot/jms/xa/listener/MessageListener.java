@@ -14,13 +14,10 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping(MessageListener.ROOT_PATH)
+@RequestMapping("listener")
 @Log4j2
 public class MessageListener implements HealthIndicator {
   public static final String QUEUE = "queue";
-  public static final String ROOT_PATH = "listener";
-  public static final String START_PATH = "start";
-  public static final String STOP_PATH = "stop";
 
   private final TaskExecutor executor;
   private final JmsListenerEndpointRegistry registry;
@@ -29,21 +26,8 @@ public class MessageListener implements HealthIndicator {
       @SuppressWarnings("SpringJavaInjectionPointsAutowiringInspection") TaskExecutor executor,
       ApplicationContext context) {
     this.executor = executor;
-    registry = context.getBean(JmsListenerEndpointRegistry.class);
-  }
-
-  @PostMapping(START_PATH)
-  void startListener() {
-    if (!registry.isRunning()) {
-      registry.start();
-    }
-  }
-
-  @PostMapping(STOP_PATH)
-  void stopListener() {
-    if (registry.isRunning()) {
-      registry.stop();
-    }
+    registry = context.getBean("org.springframework.jms.config.internalJmsListenerEndpointRegistry",
+        JmsListenerEndpointRegistry.class);
   }
 
   @JmsListener(destination = QUEUE, containerFactory = BeanProvider.JMS_FACTORY)
@@ -54,6 +38,20 @@ public class MessageListener implements HealthIndicator {
     if (message.contains("fail")) {
       executor.execute(registry::stop);
       throw new RuntimeException("ouch");
+    }
+  }
+
+  @PostMapping("start")
+  void startListener() {
+    if (!registry.isRunning()) {
+      registry.start();
+    }
+  }
+
+  @PostMapping("stop")
+  void stopListener() {
+    if (registry.isRunning()) {
+      registry.stop();
     }
   }
 
