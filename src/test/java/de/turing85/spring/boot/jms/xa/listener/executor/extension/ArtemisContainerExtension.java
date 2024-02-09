@@ -23,16 +23,12 @@ public class ArtemisContainerExtension
   // @formatter:off
   @SuppressWarnings("resource")
   private static final GenericContainer<?> ARTEMIS = new GenericContainer<>(DockerImageName
-      .parse("quay.io/artemiscloud/activemq-artemis-broker-kubernetes:artemis.2.32.0"))
-      .withEnv("AMQ_USER", USERNAME)
-      .withEnv("AMQ_PASSWORD", PASSWORD)
-      .withEnv("AMQ_EXTRA_ARGS", "--relax-jolokia")
+      .parse("docker.io/apache/activemq-artemis:2.32.0-alpine"))
+      .withEnv("ARTEMIS_USER", USERNAME)
+      .withEnv("ARTEMIS_PASSWORD", PASSWORD)
       .withCopyToContainer(
-          MountableFile.forClasspathResource("artemis/opt/amq/bin/broker.xml", 0x444),
-          "/opt/amq/bin/broker.xml")
-      .withCopyToContainer(
-          MountableFile.forClasspathResource("artemis/opt/amq/bin/configure_custom_config.sh", 0x555),
-          "/opt/amq/bin/configure_custom_config.sh")
+          MountableFile.forClasspathResource("artemis/var/lib/artemis-instance/etc-override/broker.xml", 0b110_100_100),
+          "/var/lib/artemis-instance/etc-override/broker.xml")
       .withExposedPorts(61616, 8161)
       .withLogConsumer(new Slf4jLogConsumer(TC_LOGGER).withSeparateOutputStreams())
       .waitingFor(Wait
